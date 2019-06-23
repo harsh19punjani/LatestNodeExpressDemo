@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+//express templating engine
+var hbs = require('express-handlebars');
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -12,7 +14,49 @@ var router=require('./router');
 
 var app = express();
 
-// view engine setup
+// Express Status Monitor for monitoring server status
+app.use(require('express-status-monitor')({
+  title: 'Server Status',
+  path: '/status',
+  // websocket: existingSocketIoInstance,
+  spans: [{
+    interval: 1,
+    retention: 60
+  }, {
+    interval: 5,
+    retention: 60
+  }, {
+    interval: 15,
+    retention: 60
+  }],
+  chartVisibility: {
+    cpu: true,
+    mem: true,
+    load: true,
+    responseTime: true,
+    rps: true,
+    statusCodes: true
+  },
+  healthChecks: [{
+    protocol: 'http',
+    host: 'localhost',
+    path: '/',
+    port: '3000'
+  },{
+    protocol: 'http',
+    host: 'localhost',
+    path: '/harsh',
+    port: '3000'
+  }]
+}));
+
+// view engine setup - Express-Handlebars
+app.engine('hbs', hbs({
+  extname: 'hbs',
+  defaultLayout: 'layout',
+  layoutsDir: __dirname + '/views/'
+}));
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
